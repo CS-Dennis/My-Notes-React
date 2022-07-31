@@ -2,6 +2,7 @@ import { createTheme, ThemeProvider } from "@mui/material";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Home from "./Home";
 
+
 const theme = createTheme(
   {
     palette: {
@@ -17,6 +18,22 @@ const theme = createTheme(
         primary: 'rgba(0,0,0,0.87)',
       },
     },
+
+    typography: {
+      fontFamily: [
+        '-apple-system',
+        'BlinkMacSystemFont',
+        '"Segoe UI"',
+        'Roboto',
+        '"Helvetica Neue"',
+        'Arial',
+        'sans-serif',
+        '"Apple Color Emoji"',
+        '"Segoe UI Emoji"',
+        '"Segoe UI Symbol"',
+      ].join(','),
+    },
+
   }
 );
 
@@ -25,7 +42,7 @@ function App() {
     <ThemeProvider theme={theme}>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Home />}></Route>
+          <Route path="/" exact element={<Home />}></Route>
         </Routes>
       </BrowserRouter>
     </ThemeProvider>

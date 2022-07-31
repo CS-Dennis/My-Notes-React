@@ -5,31 +5,52 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import MenuIcon from '@mui/icons-material/Menu';
 import IconButton from '@mui/material/IconButton';
-import { Button, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { Button, Card, CardContent, CardHeader, CardMedia, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Modal } from '@mui/material';
 import React, { useState } from 'react';
 import { Container } from '@mui/system';
+import AddRoundedIcon from '@mui/icons-material/AddRounded';
+import Notes from './Notes';
 
 // import toggleDrawer from "./Drawer";
 
 
 
 
-export default function Header() {
+export default function Header({ notes, setNotes, setSelectedNoteId, setSelectedNote }) {
 
     const [open, setOpen] = useState(false);
 
-    function test(text) {
-        console.log(text);
-    }
 
     function toggleDrawer(open) {
         setOpen(open);
     }
 
-    function clickMenuItem(item) {
-        console.log(item);
+    function clickMenuItem(key) {
         setOpen(false);
+
+        const currentDay = new Date();
+        const timestamp = (currentDay.getMonth() + 1) + "/" + currentDay.getDate() + "/" + currentDay.getFullYear() + " " + currentDay.getHours() + ":" + currentDay.getMinutes() + ":" + currentDay.getSeconds();
+
+        if (key === "add") {
+            let newId = new Date().getTime();
+            let newNote = {
+                id: newId,
+                title: "New Note",
+                content: "",
+                createdDateTime: timestamp,
+                modifiedDateTime: timestamp
+            }
+            setNotes([...notes, newNote]);
+
+            setSelectedNoteId(newId);
+            setSelectedNote(newNote);
+
+        }
     }
+
+    const drawerItems = [
+        { key: "add", label: "Add a New Note" },
+    ]
 
     const list = () =>
     (
@@ -37,11 +58,17 @@ export default function Header() {
             minWidth={250}
             role="presentation"
         >
+            <Card sx={{ textAlign: "center", paddingBottom: "10px" }}>
+                <CardHeader title="Notes App" />
+                <div>Version 0.1.0</div>
+                <CardMedia component="img" image='./notes_app.png' sx={{ width: "40%", margin: "auto" }} />
+            </Card>
             <List>
-                {["Add a New Note"].map((text, index) => (
-                    <ListItem key={text} disablePadding>
-                        <ListItemButton onClick={() => clickMenuItem(text)}>
-                            <ListItemText primary={text} />
+                {drawerItems.map((item, index) => (
+                    <ListItem key={index} disablePadding>
+                        <ListItemButton onClick={() => clickMenuItem(item.key)}>
+                            <ListItemIcon>{item.key === "add" && <AddRoundedIcon />}</ListItemIcon>
+                            <ListItemText primary={item.label} />
                         </ListItemButton>
                     </ListItem>
                 ))}
@@ -83,6 +110,8 @@ export default function Header() {
                     {list()}
                 </Drawer>
             </React.Fragment>
+
+
         </>
     )
 }
