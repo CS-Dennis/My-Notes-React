@@ -1,18 +1,22 @@
-import { Box, Button, Chip, Container, Drawer, Grid, Input, List, ListItem, ListItemButton, ListItemText, Paper, TextField, Typography } from '@mui/material';
+import { Box, Button, Chip, Container, Dialog, DialogTitle, Drawer, Fab, Grid, Input, List, ListItem, ListItemButton, ListItemText, Paper, TextField, Typography } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react'
 import AccessTimeRoundedIcon from '@mui/icons-material/AccessTimeRounded';
-import Axios from 'axios';
+import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
+import AddIcon from '@mui/icons-material/Add';
 
-
+var headerHeight = 0;
+var windowHeight = 0;
 
 export default function Notes({ notes, setNotes, selectedNoteId, setSelectedNoteId, selectedNote, setSelectedNote }) {
     let [editorRows, setEditorRows] = useState(1);
     let [listHeight, setListHeight] = useState(0);
+    const [modalOpen, setModalOpen] = useState(false);
 
     // init
     useEffect(() => {
-        var headerHeight = document.getElementById("header").clientHeight;
-        var windowHeight = window.innerHeight;
+        headerHeight = document.getElementById("header").clientHeight;
+        windowHeight = window.innerHeight;
         // console.log(headerHeight);
         // console.log(windowHeight);
         setEditorRows(parseInt((windowHeight - headerHeight - 20) / 27));
@@ -22,17 +26,18 @@ export default function Notes({ notes, setNotes, selectedNoteId, setSelectedNote
     }, [])
 
     useEffect(() => {
-      console.log(selectedNoteId);
-      if(selectedNoteId!==null)
-      {
-        const list = document.getElementsByClassName("listItems");
-        for (let index = 0; index < list.length; index++) {
-            list[index].style.backgroundColor = "white";
+        console.log(selectedNoteId);
+        if (selectedNoteId !== null) {
+            const list = document.getElementsByClassName("listItems");
+            for (let index = 0; index < list.length; index++) {
+                list[index].style.backgroundColor = "white";
+                list[index].style.color = "black";
+            }
+            document.getElementById(selectedNoteId).style.backgroundColor = "#42c3be";
+            document.getElementById(selectedNoteId).style.color = "white";
         }
-        document.getElementById(selectedNoteId).style.backgroundColor = "#42c3be";
-      }
     }, [selectedNoteId])
-    
+
 
 
 
@@ -72,20 +77,58 @@ export default function Notes({ notes, setNotes, selectedNoteId, setSelectedNote
         setSelectedNote({ ...findNote });
     }
 
-    function deleteSelectedNote()
-    {
+    function showDeleteModal() {
+        console.log(selectedNoteId);
+        setModalOpen(true);
+    }
+
+    function closeDeleteModal() {
+        setModalOpen(false);
+        console.log("Close delete modal");
+    }
+
+    function deleteSelectedNote() {
         console.log(notes);
         console.log(selectedNoteId);
         console.log(selectedNote);
-        let currentNote = notes.find((note)=>note.id===selectedNoteId);
+        closeDeleteModal();
+
+        let currentNote = notes.find((note) => note.id === selectedNoteId);
         let currentNoteIndex = notes.indexOf(currentNote);
-        let newNotes = notes.slice(0, currentNoteIndex).concat(notes.slice(currentNoteIndex+1, notes.length));
-        
-        setNotes([...newNotes]);
-        setSelectedNote(newNotes[0]);
-        setSelectedNoteId(newNotes[0].id);
-        
+        let newNotes = notes.slice(0, currentNoteIndex).concat(notes.slice(currentNoteIndex + 1, notes.length));
+
+        if (newNotes.length > 0) {
+            setNotes([...newNotes]);
+            setSelectedNote(newNotes[0]);
+            setSelectedNoteId(newNotes[0].id);
+        }
+        else {
+            setNotes([]);
+            setSelectedNote(null);
+            setSelectedNoteId(null);
+        }
+
+
         console.log(newNotes);
+
+
+    }
+
+    function addNewNote() {
+        const currentDay = new Date();
+        const timestamp = (currentDay.getMonth() + 1) + "/" + currentDay.getDate() + "/" + currentDay.getFullYear() + " " + currentDay.getHours() + ":" + currentDay.getMinutes() + ":" + currentDay.getSeconds();
+        let newId = new Date().getTime();
+        let newNote = {
+            id: newId,
+            title: "New Note",
+            content: "",
+            createdDateTime: timestamp,
+            modifiedDateTime: timestamp
+        }
+        setNotes([...notes, newNote]);
+
+        setSelectedNoteId(newId);
+        setSelectedNote(newNote);
     }
 
     // *********************************************************************************************************************
@@ -96,7 +139,19 @@ export default function Notes({ notes, setNotes, selectedNoteId, setSelectedNote
                 <Grid container>
                     {/* sm screen */}
                     <Grid item xs={12} sx={{ display: { xs: "block", sm: "none" } }}>
-                        small list
+                        <List sx={{overflowY: "auto", height:( windowHeight - headerHeight-40+"px")}}>
+                            {notes.map((note) =>
+                                <ListItem onClick={()=>getNotebyKey(note.id)}>
+                                    <ListItemButton>
+                                        <ListItemText primary={<Typography sx={{fontWeight: "bold"}}>{note.title}</Typography>} secondary={note.modifiedDateTime} />
+                                    </ListItemButton>
+                                </ListItem>
+                            )}
+                        </List>
+
+                        {
+
+                        }
                     </Grid>
 
                     {/* md or larger screen */}
@@ -105,9 +160,9 @@ export default function Notes({ notes, setNotes, selectedNoteId, setSelectedNote
                         notes.length > 0
                         &&
                         <Grid item sx={{ display: { xs: 'none', sm: 'block' } }} sm={3} >
-                            <List sx={{ maxHeight: listHeight, overflowY: "auto", width: "90%" }}>
+                            <List sx={{ maxHeight: listHeight, overflowY: "auto", width: "90%", overflowX: "hidden" }}>
                                 {notes.map((note) =>
-                                    <ListItem disablePadding className="listItems" id={note.id} key={note.id} onClick={() => getNotebyKey(note.id)} sx={{ marginTop: 1}}>
+                                    <ListItem disablePadding className="listItems" id={note.id} key={note.id} onClick={() => getNotebyKey(note.id)} sx={{ marginTop: 1 }}>
                                         <ListItemButton>
                                             <ListItemText primary={<Typography style={{ fontWeight: "bold" }}>{note.title}</Typography>} secondary={note.modifiedDateTime} />
                                         </ListItemButton>
@@ -145,9 +200,9 @@ export default function Notes({ notes, setNotes, selectedNoteId, setSelectedNote
                                 notes.length > 0
                                 &&
                                 <>
-                                    <div style={{display: "flex"}}>
+                                    <div style={{ display: "flex" }}>
                                         <Input sx={{ flex: 0.9 }} value={selectedNote.title} onChange={(e) => updateSelectedNoteTitle(e)} />
-                                        <Button sx={{ flex: 0.1 }} variant='contained' color="error" onClick={()=>deleteSelectedNote()}>Delete</Button>
+                                        <Button sx={{ flex: 0.1 }} variant='contained' color="error" onClick={() => showDeleteModal()}>Delete</Button>
                                     </div>
                                 </>
                             }
@@ -173,6 +228,22 @@ export default function Notes({ notes, setNotes, selectedNoteId, setSelectedNote
                 </Grid>
             </Container>
 
+            {/* dialog for deleting notes */}
+            <Dialog open={modalOpen}>
+                <DialogTitle>Delete this note?</DialogTitle>
+                <Grid container sx={{ textAlign: "center", paddingBottom: "20px" }}>
+                    <Grid item xs={6}>
+                        <Button variant='contained' color="error" startIcon={<DeleteRoundedIcon />} onClick={() => deleteSelectedNote()}>Yes</Button>
+                    </Grid>
+                    <Grid item xs={6}>
+                        <Button variant="outlined" color="primary" startIcon={<CloseRoundedIcon />} onClick={() => closeDeleteModal()}>No</Button>
+                    </Grid>
+                </Grid>
+            </Dialog>
+
+            <Fab color="primary" sx={{ position: "fixed", right: "40px", bottom: "40px" }} onClick={() => addNewNote("add")}>
+                <AddIcon  />
+            </Fab>
         </>
     )
 }
