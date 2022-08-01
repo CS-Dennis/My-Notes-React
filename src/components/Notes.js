@@ -1,4 +1,4 @@
-import { Box, Button, Chip, Container, Dialog, DialogTitle, Drawer, Fab, Grid, Input, List, ListItem, ListItemButton, ListItemText, Paper, TextField, Typography } from '@mui/material';
+import { Box, Button, Chip, Container, Dialog, DialogTitle, Drawer, Fab, Grid, Input, List, ListItem, ListItemButton, ListItemText, Paper, Snackbar, TextField, Typography } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react'
 import AccessTimeRoundedIcon from '@mui/icons-material/AccessTimeRounded';
 import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
@@ -12,6 +12,7 @@ export default function Notes({ notes, setNotes, selectedNoteId, setSelectedNote
     let [editorRows, setEditorRows] = useState(1);
     let [listHeight, setListHeight] = useState(0);
     const [modalOpen, setModalOpen] = useState(false);
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
 
     // init
     useEffect(() => {
@@ -241,9 +242,22 @@ export default function Notes({ notes, setNotes, selectedNoteId, setSelectedNote
                 </Grid>
             </Dialog>
 
+            {/* Add note floating button */}
             <Fab color="primary" sx={{ position: "fixed", right: "40px", bottom: "40px" }} onClick={() => addNewNote("add")}>
                 <AddIcon  />
             </Fab>
+
+            {/* snackbar when note deleted */}
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration = {300}
+                message = "Note deleted"
+                action={
+                    <>
+                        <Button variant='outlined' onClick={()=> closeSnanckBar}>Ok</Button>
+                    </>
+                }
+            />
         </>
     )
 }
