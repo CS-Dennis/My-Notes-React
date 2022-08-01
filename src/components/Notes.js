@@ -1,9 +1,10 @@
-import { Box, Button, Chip, Container, Dialog, DialogTitle, Drawer, Fab, Grid, Input, List, ListItem, ListItemButton, ListItemText, Paper, Snackbar, TextField, Typography } from '@mui/material';
+import { Box, Button, Chip, Container, Dialog, DialogTitle, Drawer, Fab, Grid, Input, List, ListItem, ListItemButton, ListItemText, Menu, MenuItem, Paper, Snackbar, TextField, Typography } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react'
 import AccessTimeRoundedIcon from '@mui/icons-material/AccessTimeRounded';
 import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import AddIcon from '@mui/icons-material/Add';
+import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';
 
 var headerHeight = 0;
 var windowHeight = 0;
@@ -109,7 +110,7 @@ export default function Notes({ notes, setNotes, selectedNoteId, setSelectedNote
             setSelectedNoteId(null);
         }
 
-
+        setSnackbarOpen(true);
         console.log(newNotes);
 
 
@@ -132,6 +133,19 @@ export default function Notes({ notes, setNotes, selectedNoteId, setSelectedNote
         setSelectedNote(newNote);
     }
 
+    function closeSnackbar() {
+        setSnackbarOpen(false);
+    }
+
+    const [menuOpen, setMenuOpen] = React.useState(null);
+    const open = Boolean(menuOpen);
+    const handleClick = (event) => {
+        setMenuOpen(event.currentTarget);
+    };
+    const handleClose = () => {
+        setMenuOpen(null);
+    };
+
     // *********************************************************************************************************************
 
     return (
@@ -140,11 +154,11 @@ export default function Notes({ notes, setNotes, selectedNoteId, setSelectedNote
                 <Grid container>
                     {/* sm screen */}
                     <Grid item xs={12} sx={{ display: { xs: "block", sm: "none" } }}>
-                        <List sx={{overflowY: "auto", height:( windowHeight - headerHeight-40+"px")}}>
+                        <List sx={{ overflowY: "auto", height: (windowHeight - headerHeight - 40 + "px") }}>
                             {notes.map((note) =>
-                                <ListItem onClick={()=>getNotebyKey(note.id)}>
+                                <ListItem onClick={() => getNotebyKey(note.id)}>
                                     <ListItemButton>
-                                        <ListItemText primary={<Typography sx={{fontWeight: "bold"}}>{note.title}</Typography>} secondary={note.modifiedDateTime} />
+                                        <ListItemText primary={<Typography sx={{ fontWeight: "bold" }}>{note.title}</Typography>} secondary={note.modifiedDateTime} />
                                     </ListItemButton>
                                 </ListItem>
                             )}
@@ -203,7 +217,44 @@ export default function Notes({ notes, setNotes, selectedNoteId, setSelectedNote
                                 <>
                                     <div style={{ display: "flex" }}>
                                         <Input sx={{ flex: 0.9 }} value={selectedNote.title} onChange={(e) => updateSelectedNoteTitle(e)} />
-                                        <Button sx={{ flex: 0.1 }} variant='contained' color="error" onClick={() => showDeleteModal()}>Delete</Button>
+                                        <span style={{ flex: 0.05 }} />
+                                        {/* <Button id="menu-button"  aria-controls={true ? 'menu' : undefined} aria-expanded={true ? 'true' : undefined}
+sx={{color: "black"}}><MoreVertRoundedIcon /></Button>
+                                        <Menu 
+                                            id="menu"
+                                            open={true}
+                                            MenuListProps={{
+                                                'aria-labelledby':'menu-button'
+                                            }}
+                                        >
+                                            <MenuItem>Delete</MenuItem>
+                                            <MenuItem>Archive</MenuItem>
+                                        </Menu> */}
+                                        {/* <Button sx={{ flex: 0.05}} variant='contained' color="error" onClick={() => showDeleteModal()}><DeleteRoundedIcon /></Button> */}
+
+
+                                        <Button
+                                            id="basic-button"
+                                            aria-controls={open ? 'basic-menu' : undefined}
+                                            aria-haspopup="true"
+                                            aria-expanded={open ? 'true' : undefined}
+                                            onClick={handleClick}
+                                            sx={{color: "black"}}
+                                        >
+                                            <MoreVertRoundedIcon />
+                                        </Button>
+                                        <Menu
+                                            id="basic-menu"
+                                            anchorEl={menuOpen}
+                                            open={open}
+                                            onClose={handleClose}
+                                            MenuListProps={{
+                                                'aria-labelledby': 'basic-button',
+                                            }}
+                                        >
+                                            <MenuItem onClick={handleClose}>Delete</MenuItem>
+                                            <MenuItem onClick={handleClose}>Archive</MenuItem>
+                                        </Menu>
                                     </div>
                                 </>
                             }
@@ -244,19 +295,20 @@ export default function Notes({ notes, setNotes, selectedNoteId, setSelectedNote
 
             {/* Add note floating button */}
             <Fab color="primary" sx={{ position: "fixed", right: "40px", bottom: "40px" }} onClick={() => addNewNote("add")}>
-                <AddIcon  />
+                <AddIcon />
             </Fab>
 
             {/* snackbar when note deleted */}
             <Snackbar
                 open={snackbarOpen}
-                autoHideDuration = {300}
-                message = "Note deleted"
+                autoHideDuration={3000}
+                message="Note deleted"
                 action={
                     <>
-                        <Button variant='outlined' onClick={()=> closeSnanckBar}>Ok</Button>
+                        <Button variant='outlined' onClick={() => closeSnackbar()}>Ok</Button>
                     </>
                 }
+                onClose={() => setSnackbarOpen(false)}
             />
         </>
     )
