@@ -32,6 +32,42 @@ export default function Header({
   setSelectedNoteId,
   setSelectedNote,
 }) {
+
+  const drawerItems = [
+    { key: "add", label: "Add a New Note" },
+    { key: "archive", label: "Archive" },
+    { key: "trash", label: "Trash" },
+  ];
+
+  const list = () => (
+    <Box minWidth={250} role="presentation">
+      <Card sx={{ textAlign: "center", paddingBottom: "10px" }}>
+        <CardHeader title="Notes App" />
+        <div>Version 0.1.0</div>
+        <CardMedia
+          component="img"
+          image="./notes_app.png"
+          sx={{ width: "40%", margin: "auto" }}
+        />
+      </Card>
+      <List>
+        {drawerItems.map((item, index) => (
+          <ListItem key={index} disablePadding>
+            <ListItemButton onClick={() => clickMenuItem(item.key)}>
+              <ListItemIcon>
+                {item.key === "add" && <AddRoundedIcon />}
+                {item.key === "archive" && <ArchiveRoundedIcon />}
+                {item.key === "trash" && <DeleteSweepRoundedIcon />}
+              </ListItemIcon>
+              <ListItemText primary={item.label} />
+            </ListItemButton>
+          </ListItem>
+        ))}
+      </List>
+    </Box>
+  );
+
+
   const [open, setOpen] = useState(false);
 
   function toggleDrawer(open) {
@@ -70,41 +106,15 @@ export default function Header({
       setSelectedNoteId(newId);
       setSelectedNote(newNote);
     }
+    else if (key === "archive") {
+      console.log("show the archive dom");
+    }
+    else if (key === "trash") {
+      console.log("show the trash dom");
+    }
   }
 
-  const drawerItems = [
-    { key: "add", label: "Add a New Note" },
-    { key: "archive", label: "Archive" },
-    { key: "trash", label: "Trash" },
-  ];
 
-  const list = () => (
-    <Box minWidth={250} role="presentation">
-      <Card sx={{ textAlign: "center", paddingBottom: "10px" }}>
-        <CardHeader title="Notes App" />
-        <div>Version 0.1.0</div>
-        <CardMedia
-          component="img"
-          image="./notes_app.png"
-          sx={{ width: "40%", margin: "auto" }}
-        />
-      </Card>
-      <List>
-        {drawerItems.map((item, index) => (
-          <ListItem key={index} disablePadding>
-            <ListItemButton onClick={() => clickMenuItem(item.key)}>
-              <ListItemIcon>
-                {item.key === "add" && <AddRoundedIcon />}
-                {item.key === "archive" && <ArchiveRoundedIcon />}
-                {item.key === "trash" && <DeleteSweepRoundedIcon />}
-              </ListItemIcon>
-              <ListItemText primary={item.label} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
-    </Box>
-  );
 
   return (
     <>

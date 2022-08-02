@@ -5,6 +5,7 @@ import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import AddIcon from '@mui/icons-material/Add';
 import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';
+import ArchiveRoundedIcon from '@mui/icons-material/ArchiveRounded';
 
 var headerHeight = 0;
 var windowHeight = 0;
@@ -82,6 +83,9 @@ export default function Notes({ notes, setNotes, selectedNoteId, setSelectedNote
     function showDeleteModal() {
         console.log(selectedNoteId);
         setModalOpen(true);
+
+        // close the note menu dropdown
+        setMenuOpen(false);
     }
 
     function closeDeleteModal() {
@@ -137,14 +141,22 @@ export default function Notes({ notes, setNotes, selectedNoteId, setSelectedNote
         setSnackbarOpen(false);
     }
 
-    const [menuOpen, setMenuOpen] = React.useState(null);
+    // note dropdown menu
+    const [menuOpen, setMenuOpen] = React.useState(false);
     const open = Boolean(menuOpen);
     const handleClick = (event) => {
         setMenuOpen(event.currentTarget);
     };
     const handleClose = () => {
-        setMenuOpen(null);
+        setMenuOpen(false);
     };
+
+    // archive note
+    function archiveNote()
+    {
+        console.log("Archived this note");
+        setMenuOpen(false);
+    }
 
     // *********************************************************************************************************************
 
@@ -155,8 +167,8 @@ export default function Notes({ notes, setNotes, selectedNoteId, setSelectedNote
                     {/* sm screen */}
                     <Grid item xs={12} sx={{ display: { xs: "block", sm: "none" } }}>
                         <List sx={{ overflowY: "auto", height: (windowHeight - headerHeight - 40 + "px") }}>
-                            {notes.map((note) =>
-                                <ListItem onClick={() => getNotebyKey(note.id)}>
+                            {notes.map((note, index) =>
+                                <ListItem key={index} onClick={() => getNotebyKey(note.id)}>
                                     <ListItemButton>
                                         <ListItemText primary={<Typography sx={{ fontWeight: "bold" }}>{note.title}</Typography>} secondary={note.modifiedDateTime} />
                                     </ListItemButton>
@@ -235,9 +247,9 @@ sx={{color: "black"}}><MoreVertRoundedIcon /></Button>
 
                                         <Button
                                             id="basic-button"
-                                            aria-controls={open ? 'basic-menu' : undefined}
+                                            aria-controls={open ? 'basic-menu' : false}
                                             aria-haspopup="true"
-                                            aria-expanded={open ? 'true' : undefined}
+                                            aria-expanded={open ? 'true' : false}
                                             onClick={handleClick}
                                             sx={{color: "black"}}
                                         >
@@ -252,8 +264,8 @@ sx={{color: "black"}}><MoreVertRoundedIcon /></Button>
                                                 'aria-labelledby': 'basic-button',
                                             }}
                                         >
-                                            <MenuItem onClick={handleClose}>Delete</MenuItem>
-                                            <MenuItem onClick={handleClose}>Archive</MenuItem>
+                                            <MenuItem onClick={()=>showDeleteModal()}><DeleteRoundedIcon sx={{paddingRight: "10px"}} /> Delete</MenuItem>
+                                            <MenuItem onClick={()=>archiveNote()}><ArchiveRoundedIcon sx={{paddingRight: "10px"}} />Archive</MenuItem>
                                         </Menu>
                                     </div>
                                 </>
